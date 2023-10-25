@@ -1,8 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import "./home.scss"
 import bg from "../../assets/bg.png"
 import lock from "../../assets/lock.png"
+import Modal from '../Modal/Modal'
 const Home = () => {
+    const[showModal, setShowModal] = useState(false)
+
+        const closeModal =()=>setShowModal(false);
+
+
   return (
     <>
     <div className='container'>
@@ -10,12 +16,11 @@ const Home = () => {
             <div className='heading'>
                 <h1>Pocket Notes</h1>
             </div>
-            <div className='add'>
-                
+            <button className='add' onClick={()=> setShowModal(true)}>                
                     <p id='symbol'>+</p>
-                    <p id='para'>Create Notes group</p>
-               
-            </div>
+                    <p id='para'>Create Notes group</p>     
+            </button>
+           {showModal && <Modal closeModal={closeModal}/>}
             <div className='notes'>
                 <div className='notes-details'>
                     <div className='icon'>
