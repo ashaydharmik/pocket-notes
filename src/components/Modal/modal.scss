@@ -24,6 +24,7 @@
   border-radius: 1rem;
   padding: 1rem;
   @include md {
+    
     width: 50%;
     height: 28rem;
     // border-radius: 1rem;
@@ -63,6 +64,7 @@
         width: 61%;
         margin-bottom: 2rem;
         padding: 10px;
+        font-size: 1.6rem;
         @include md {
           height: 3.5rem;
           width: 70%;
