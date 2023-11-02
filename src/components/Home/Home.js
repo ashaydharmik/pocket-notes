@@ -12,14 +12,14 @@ const Home = () => {
   const [selectedNoteName, setSelectedNoteName] = useState(null);
   const [isInNotesBox, setIsInNotesBox] = useState(false);
   const [textareaValue, setTextareaValue] = useState("");
-  const [notes, setNotes] = useState([]);
+  const [notesByGroup, setNotesByGroup] = useState({});
 
   useEffect(() => {
     const storedGroups = JSON.parse(localStorage.getItem("groups")) || [];
-    const storedNotes = JSON.parse(localStorage.getItem("notes")) || [];
+    const storedNotes = JSON.parse(localStorage.getItem("notes")) || {};
 
     setGroups(storedGroups);
-    setNotes(storedNotes);
+    setNotesByGroup(storedNotes);
   }, []);
 
   const closeModal = () => setShowModal(false);
@@ -79,14 +79,28 @@ const Home = () => {
     const formattedDate = `${day} ${month} ${year}`;
     const time = now.toLocaleTimeString();
 
+    // Get the selected group's notes array or create a new one if it doesn't exist.
+    const selectedNotes = notesByGroup[selectedNoteName] || [];
+
     const newNote = {
       text: noteText,
       time: time,
       date: formattedDate,
     };
 
-    setNotes([...notes, newNote]);
-    localStorage.setItem("notes", JSON.stringify([...notes, newNote]));
+    const updatedNotes = [...selectedNotes, newNote];
+
+    setNotesByGroup({
+      ...notesByGroup,
+      [selectedNoteName]: updatedNotes,
+    });
+
+    // Update localStorage for the selected group's notes.
+    const updatedLocalStorage = {
+      ...JSON.parse(localStorage.getItem("notes")) || {},
+      [selectedNoteName]: updatedNotes,
+    };
+    localStorage.setItem("notes", JSON.stringify(updatedLocalStorage));
   };
 
   const handleEnterImageClick = () => {
@@ -136,6 +150,7 @@ const Home = () => {
               {selectedNoteName &&
                 groups.map((note, index) => {
                   if (note.name === selectedNoteName) {
+                    const selectedNotes = notesByGroup[selectedNoteName] || [];
                     return (
                       <>
                         <div key={index} className="note-header">
@@ -151,7 +166,7 @@ const Home = () => {
                           <h1>{note.name}</h1>
                         </div>
                         <div className="notes-written">
-                          {notes.map((note, index) => (
+                          {selectedNotes.map((note, index) => (
                             <div key={index} className="notes-col">
                               <div className="time-date">
                                 <p>{note.time}</p>
