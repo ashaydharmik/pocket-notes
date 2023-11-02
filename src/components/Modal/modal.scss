@@ -13,7 +13,6 @@
   background: rgba(47, 47, 47, 0.75);
 }
 .modal-container {
-  // margin: 5rem;
   position: fixed;
   left: 50%;
   top: 50%;
@@ -23,11 +22,9 @@
   height: 20rem;
   border-radius: 1rem;
   padding: 1rem;
-  @include md {
-    
+  @include md { 
     width: 50%;
     height: 28rem;
-    // border-radius: 1rem;
     padding: 2rem;
   }
   .modal {
@@ -52,9 +49,7 @@
         margin-right: 1rem;
         @include md {
           font-size: 2rem;
-          // font-weight: 600;
           margin-right: 4rem;
-        //   font-weight: semi-bold;
         }
       }
       input {
@@ -81,7 +76,6 @@
       .color-box {
         display: flex;
         align-items: center;
-
         .colors {
           display: flex;
           align-items: center;
@@ -129,7 +123,6 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        /* height: 51%; */
         cursor: pointer;
         @include md{
             margin-top: 3.5rem;
@@ -149,7 +142,6 @@
             padding: 0.8rem;
             font-size: 1.9rem;
             letter-spacing: 1px;
-            // font-weight: 600;
           }
         }
       }

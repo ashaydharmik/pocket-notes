@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./modal.scss";
+
 const Modal = ({ closeModal, createGroup }) => {
   const [selectedColor, setSelectedColor] = useState('purple');
-  //to store notes names
-  const[noteName, setNoteName] = useState("")
- 
-  
+  const [noteName, setNoteName] = useState("");
 
   const selectColors = (color) => {
     if (selectedColor === color) {
@@ -19,30 +17,35 @@ const Modal = ({ closeModal, createGroup }) => {
     return selectedColor === color ? { border: "1px solid black" } : {};
   };
 
-  const handleNameChange=(e)=>{
-    setNoteName(e.target.value); 
-  }
+  const handleNameChange = (e) => {
+    setNoteName(e.target.value);
+  };
 
   const handleForm = (e) => {
     e.preventDefault();
     if (noteName && selectedColor) {
       createGroup(noteName, selectedColor);
-  
-      // Retrieve the existing data from local storage or initialize an empty array
       const existingNoteNames = JSON.parse(localStorage.getItem("storedNoteName")) || [];
-      
-  
-      // Update the data by adding the new note name
       const updatedNoteNames = [...existingNoteNames, noteName];
-      // console.log(updatedNoteNames)
-      // Save the updated data back to local storage
       localStorage.setItem("storedNoteName", JSON.stringify(updatedNoteNames));
     }
     closeModal();
   };
-  
- 
-  
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (e.target.classList.contains("modal-wrapper")) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [closeModal]);
+
   return (
     <>
       <div className="modal-wrapper"></div>

@@ -4,12 +4,23 @@ import bg from "../../assets/bg.png";
 import lock from "../../assets/lock.png";
 import Modal from "../Modal/Modal";
 import arrow from "../../assets/Vector.png";
+import enter from "../../assets/enter.png";
 
 const Home = () => {
   const [showModal, setShowModal] = useState(false);
   const [groups, setGroups] = useState([]);
   const [selectedNoteName, setSelectedNoteName] = useState(null);
   const [isInNotesBox, setIsInNotesBox] = useState(false);
+  const [textareaValue, setTextareaValue] = useState("");
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    const storedGroups = JSON.parse(localStorage.getItem("groups")) || [];
+    const storedNotes = JSON.parse(localStorage.getItem("notes")) || [];
+
+    setGroups(storedGroups);
+    setNotes(storedNotes);
+  }, []);
 
   const closeModal = () => setShowModal(false);
 
@@ -21,10 +32,15 @@ const Home = () => {
       backgroundColor: selectedColor,
     };
     setGroups([...groups, newGroup]);
+
+    localStorage.setItem("groups", JSON.stringify([...groups, newGroup]));
   };
 
   const handleNoteName = (nameOfNote) => {
-    setSelectedNoteName(nameOfNote);
+    setSelectedNoteName((prevSelectedNoteName) =>
+      prevSelectedNoteName === nameOfNote ? null : nameOfNote
+    );
+
     setIsInNotesBox(true);
 
     if (window.innerWidth < 768) {
@@ -43,6 +59,41 @@ const Home = () => {
     }
   };
 
+  const handleTextareaChange = (event) => {
+    setTextareaValue(event.target.value);
+  };
+
+  const handleEnterKeyPress = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addNoteWithTimeDate(textareaValue);
+      setTextareaValue("");
+    }
+  };
+
+  const addNoteWithTimeDate = (noteText) => {
+    const now = new Date();
+    const day = now.getDate();
+    const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(now);
+    const year = now.getFullYear();
+    const formattedDate = `${day} ${month} ${year}`;
+    const time = now.toLocaleTimeString();
+
+    const newNote = {
+      text: noteText,
+      time: time,
+      date: formattedDate,
+    };
+
+    setNotes([...notes, newNote]);
+    localStorage.setItem("notes", JSON.stringify([...notes, newNote]));
+  };
+
+  const handleEnterImageClick = () => {
+    addNoteWithTimeDate(textareaValue);
+    setTextareaValue("");
+  };
+
   return (
     <>
       <div className="container">
@@ -59,7 +110,13 @@ const Home = () => {
           )}
           <div className="notes">
             {groups.map((note, index) => (
-              <div className="notes-details" key={index}>
+              <div
+                className="notes-details"
+                key={index}
+                style={{
+                  backgroundColor: note.name === selectedNoteName ? "#F7ECDC" : "transparent",
+                }}
+              >
                 <div
                   className="icon"
                   style={{ backgroundColor: note.backgroundColor }}
@@ -76,31 +133,57 @@ const Home = () => {
         <div className="notes-box">
           {isInNotesBox ? (
             <div className="notebox-heading">
-              {selectedNoteName && groups.map((note, index) => {
-                if (note.name === selectedNoteName) {
-                  return (
-                    <>
-                    <div key={index} className="note-header">
-                      <p onClick={handleArrowClick}><img src={arrow} alt=""/></p>
-                      <div className="icon" style={{ backgroundColor: note.backgroundColor }}>
-                        <p>{note.icon}</p>
-                      </div>
-                      <h1>{note.name}</h1>
-                    </div>
-                    <div className="notes-written">
-                        <div className="time-date">
-                          <p>10:10 AM</p>
-                          <p>9 March 2023</p>
+              {selectedNoteName &&
+                groups.map((note, index) => {
+                  if (note.name === selectedNoteName) {
+                    return (
+                      <>
+                        <div key={index} className="note-header">
+                          <p onClick={handleArrowClick}>
+                            <img src={arrow} alt="" />
+                          </p>
+                          <div
+                            className="icon"
+                            style={{ backgroundColor: note.backgroundColor }}
+                          >
+                            <p>{note.icon}</p>
+                          </div>
+                          <h1>{note.name}</h1>
                         </div>
-                        <div className="desc">
-                          <p>Another productive way to use this tool to begin a daily writing routine. One way is to generate a random paragraph with the intention to try to rewrite it while still keeping the original meaning. The purpose here is to just get the writing started so that when the writer goes onto their day's writing projects, words are already flowing from their fingers.</p>
+                        <div className="notes-written">
+                          {notes.map((note, index) => (
+                            <div key={index} className="notes-col">
+                              <div className="time-date">
+                                <p>{note.time}</p>
+                                <p>{note.date}</p>
+                              </div>
+                              <div className="desc">
+                                <p>{note.text}</p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                    </div>
-                    </>
-                  );
-                }
-                return null;
-              })}
+                        <div className="footer">
+                          <textarea
+                            placeholder="Enter your text here..."
+                            value={textareaValue}
+                            onChange={handleTextareaChange}
+                            onKeyDown={handleEnterKeyPress}
+                          ></textarea>
+                          <img
+                            src={enter}
+                            alt=""
+                            width="20px"
+                            height="20px"
+                            onClick={handleEnterImageClick}
+                            style={{ cursor: "pointer" }}
+                          />
+                        </div>
+                      </>
+                    );
+                  }
+                  return null;
+                })}
             </div>
           ) : (
             <div className="content">
